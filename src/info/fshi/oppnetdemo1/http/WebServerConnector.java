@@ -1,6 +1,5 @@
 package info.fshi.oppnetdemo1.http;
 
-import info.fshi.oppnetdemo1.data.DataManager;
 import info.fshi.oppnetdemo1.data.QueueManager;
 
 import java.io.BufferedInputStream;
@@ -17,7 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -62,15 +60,13 @@ public class WebServerConnector extends BroadcastReceiver{
 			String entityId = ENTITY_URI + "data:" + data[2];
 
 			Log.d(TAG, "send data to server");
-			DataManager.getInstance(mContext).saveLog("send data to server");
-			
 			
 			JSONObject content = new JSONObject();
 			try {
 				content.put("type", "data");
 				JSONArray attrs = new JSONArray();
 				JSONObject attr = new JSONObject();
-				attr.put("name", "temp");
+				attr.put("name", "light");
 				attr.put("type", "string");
 				attr.put("value", data[1]);
 				attrs.put(attr);
@@ -94,7 +90,6 @@ public class WebServerConnector extends BroadcastReceiver{
 			HttpURLConnection connection = null;
 			try{
 				Log.d(TAG, serverUrl + entityId);
-				DataManager.getInstance(mContext).saveLog(serverUrl + entityId);
 				
 				url = new URL(serverUrl + entityId);
 				connection = (HttpURLConnection)url.openConnection();
@@ -208,9 +203,8 @@ public class WebServerConnector extends BroadcastReceiver{
 						String[] data = QueueManager.getInstance(mContext).getFromQueue();
 						new SendSensorDataTask().execute(data);
 					}
-					BluetoothAdapter.getDefaultAdapter().setName(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
+					QueueManager.getInstance(mContext).updateName();
 					Log.d(TAG, "update name to " + String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
-					DataManager.getInstance(mContext).saveLog("update name to " + String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
 					
 //					MainActivity.txMyQueueLen.setText(String.valueOf(QueueManager.getInstance(mContext).getQueueLength()));
 					updatedTime = currentTime;
